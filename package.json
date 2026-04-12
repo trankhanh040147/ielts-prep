@@ -1,0 +1,13 @@
+{
+  "name": "ielts-prep",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "test": "npm run -w apps/api test && npm run -w apps/web test",
+    "dev": "npm run -w apps/api dev",
+    "build": "npm run -w apps/api build && npm run -w apps/web build"
+  }
+}

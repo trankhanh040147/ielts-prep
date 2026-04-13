@@ -1,10 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import type { PracticeMode, FeedbackLevel } from '../types'
 
 const modelName = process.env.GEMINI_MODEL ?? 'gemini-1.5-flash'
 
 type GeminiInput = {
-  mode: 'thesis' | 'paragraph' | 'miniEssay'
-  level: 'sentence' | 'paragraph'
+  mode: PracticeMode
+  level: FeedbackLevel
   text: string
   prompt: string
 }
@@ -29,5 +30,10 @@ export async function getGeminiFeedback(input: GeminiInput): Promise<unknown> {
 
   const result = await model.generateContent(instruction)
   const text = result.response.text()
-  return JSON.parse(text)
+  const cleaned = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim()
+  try {
+    return JSON.parse(cleaned)
+  } catch {
+    return {}  // feedbackMapper will produce fallback units
+  }
 }

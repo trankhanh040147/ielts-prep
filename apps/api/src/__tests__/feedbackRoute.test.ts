@@ -26,4 +26,19 @@ describe('POST /api/feedback', () => {
     const res = await request(app).post('/api/feedback').send({ mode: 'invalid' })
     expect(res.status).toBe(400)
   })
+
+  it('returns 502 when gemini client throws', async () => {
+    const { getGeminiFeedback } = await import('../services/geminiClient')
+    vi.mocked(getGeminiFeedback).mockRejectedValueOnce(new Error('network error'))
+
+    const res = await request(app).post('/api/feedback').send({
+      mode: 'thesis',
+      level: 'sentence',
+      text: 'Some text.',
+      prompt: 'Some prompt.',
+    })
+
+    expect(res.status).toBe(502)
+    expect(res.body.error).toBe('Feedback service unavailable')
+  })
 })

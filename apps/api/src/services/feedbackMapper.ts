@@ -1,9 +1,9 @@
 import type { FeedbackLevel, FeedbackUnit } from '../types'
 
 export function mapGeminiToFeedback(raw: unknown, level: FeedbackLevel, targetText: string): FeedbackUnit[] {
-  const items = (raw as { feedback?: unknown[] } | null)?.feedback
+  const items = (raw as { feedback?: unknown[] })?.feedback
 
-  if (!Array.isArray(items) || items.length === 0) {
+  if (!Array.isArray(items)) {
     return [
       {
         level,
@@ -13,6 +13,9 @@ export function mapGeminiToFeedback(raw: unknown, level: FeedbackLevel, targetTe
         revisionHint: 'Revise one sentence for grammar and clarity.',
       },
     ]
+  }
+  if (items.length === 0) {
+    return []
   }
 
   return items.map((item) => {

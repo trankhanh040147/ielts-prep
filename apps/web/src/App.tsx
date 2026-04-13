@@ -17,6 +17,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [feedbackError, setFeedbackError] = useState<string | null>(null)
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory())
+  const [sessionId, setSessionId] = useState(() => crypto.randomUUID())
 
   const prompt = PROMPT_BANK[mode][0]
 
@@ -25,6 +26,7 @@ export default function App() {
     setDraft('')
     setFeedback([])
     setFeedbackError(null)
+    setSessionId(crypto.randomUUID())
   }
 
   async function handleCheckSentence() {
@@ -48,6 +50,7 @@ export default function App() {
     setMode(record.mode)
     setDraft(record.draft)
     setFeedback(record.feedback)
+    setFeedbackError(null)
   }
 
   return (
@@ -65,6 +68,7 @@ export default function App() {
         mode={mode}
         prompt={prompt}
         feedback={feedback}
+        sessionId={sessionId}
         onSaved={handleSaved}
       />
       <HistoryList history={history} onSelect={handleSelectRecord} />

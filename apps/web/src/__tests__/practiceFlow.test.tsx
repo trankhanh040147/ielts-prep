@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { vi, it, expect, beforeEach } from 'vitest'
 import App from '../App'
 
+beforeEach(() => localStorage.clear())
+
 it('runs thesis mode sentence feedback flow', async () => {
   vi.stubGlobal(
     'fetch',
@@ -34,8 +36,6 @@ it('runs thesis mode sentence feedback flow', async () => {
   expect(await screen.findByText(/clear thesis/i)).toBeInTheDocument()
 })
 
-beforeEach(() => localStorage.clear())
-
 it('saves practice and reloads from history', async () => {
   vi.stubGlobal(
     'fetch',
@@ -61,8 +61,10 @@ it('saves practice and reloads from history', async () => {
   // Save it
   await user.click(screen.getByRole('button', { name: /save practice/i }))
 
-  // History should now show an entry (history button contains mode name)
-  expect(screen.getAllByText(/thesis/i).length).toBeGreaterThan(1)
+  // HistoryList renders buttons with "{date} — {mode}" pattern.
+  // Find a button whose accessible name contains the em dash separator, which only history entries have.
+  const historyEntry = await screen.findByRole('button', { name: /—\s*thesis/i })
+  expect(historyEntry).toBeInTheDocument()
 })
 
 it('shows error when saving empty draft', async () => {

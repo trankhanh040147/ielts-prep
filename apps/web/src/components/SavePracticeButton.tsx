@@ -7,17 +7,18 @@ interface SavePracticeButtonProps {
   mode: PracticeMode
   prompt: string
   feedback: FeedbackUnit[]
+  sessionId: string
   onSaved: (history: PracticeRecord[]) => void
 }
 
-export function SavePracticeButton({ draft, mode, prompt, feedback, onSaved }: SavePracticeButtonProps) {
+export function SavePracticeButton({ draft, mode, prompt, feedback, sessionId, onSaved }: SavePracticeButtonProps) {
   const [error, setError] = useState<string | null>(null)
 
   function handleSave() {
     setError(null)
     try {
       const history = savePractice({
-        id: crypto.randomUUID(),
+        id: sessionId,
         mode,
         prompt,
         draft,

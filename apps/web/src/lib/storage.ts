@@ -5,8 +5,13 @@ const STORAGE_KEY = 'ieltsPrep.v0.1.history'
 export function loadHistory(): PracticeRecord[] {
   const raw = localStorage.getItem(STORAGE_KEY)
   if (!raw) return []
-  const parsed = JSON.parse(raw) as PracticeRecord[]
-  return parsed.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
+  try {
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return (parsed as PracticeRecord[]).sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1))
+  } catch {
+    return []
+  }
 }
 
 export function savePractice(record: PracticeRecord): PracticeRecord[] {

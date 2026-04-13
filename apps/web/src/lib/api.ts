@@ -1,6 +1,8 @@
+import type { PracticeMode, FeedbackLevel } from '../types'
+
 export async function requestFeedback(body: {
-  mode: 'thesis' | 'paragraph' | 'miniEssay'
-  level: 'sentence' | 'paragraph'
+  mode: PracticeMode
+  level: FeedbackLevel
   text: string
   prompt: string
 }) {
@@ -9,5 +11,8 @@ export async function requestFeedback(body: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
+  if (!res.ok) {
+    throw new Error(`Feedback API error: ${res.status}`)
+  }
   return res.json()
 }

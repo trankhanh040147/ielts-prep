@@ -13,20 +13,40 @@ export default function App() {
   const [mode, setMode] = useState<PracticeMode>('thesis')
   const [draft, setDraft] = useState('')
   const [feedback, setFeedback] = useState<FeedbackUnit[]>([])
+  const [loading, setLoading] = useState(false)
+  const [feedbackError, setFeedbackError] = useState<string | null>(null)
 
   const prompt = PROMPT_BANK[mode][0]
 
+  function handleModeChange(newMode: PracticeMode) {
+    setMode(newMode)
+    setDraft('')
+    setFeedback([])
+    setFeedbackError(null)
+  }
+
   async function handleCheckSentence() {
-    const result = await requestFeedback({ mode, level: 'sentence', text: draft, prompt })
-    setFeedback(result.feedback ?? [])
+    setLoading(true)
+    setFeedbackError(null)
+    try {
+      const result = await requestFeedback({ mode, level: 'sentence', text: draft, prompt })
+      setFeedback(result.feedback ?? [])
+    } catch {
+      setFeedbackError('Feedback service unavailable. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div>
-      <ModePicker mode={mode} onModeChange={setMode} />
+      <ModePicker mode={mode} onModeChange={handleModeChange} />
       <PromptCard prompt={prompt} />
       <DraftEditor draft={draft} onChange={setDraft} />
-      <button onClick={handleCheckSentence}>Check Sentence</button>
+      <button onClick={handleCheckSentence} disabled={loading}>
+        {loading ? 'Checking...' : 'Check Sentence'}
+      </button>
+      {feedbackError && <p role="alert">{feedbackError}</p>}
       <FeedbackPanel feedback={feedback} />
       <SavePracticeButton />
       <HistoryList />

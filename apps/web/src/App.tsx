@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import type { PracticeMode, FeedbackUnit } from './types'
+import type { PracticeMode, FeedbackUnit, PracticeRecord } from './types'
 import { requestFeedback } from './lib/api'
 import { PROMPT_BANK } from './lib/promptBank'
+import { loadHistory } from './lib/storage'
 import { ModePicker } from './components/ModePicker'
 import { PromptCard } from './components/PromptCard'
 import { DraftEditor } from './components/DraftEditor'
@@ -15,6 +16,7 @@ export default function App() {
   const [feedback, setFeedback] = useState<FeedbackUnit[]>([])
   const [loading, setLoading] = useState(false)
   const [feedbackError, setFeedbackError] = useState<string | null>(null)
+  const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory())
 
   const prompt = PROMPT_BANK[mode][0]
 
@@ -38,6 +40,16 @@ export default function App() {
     }
   }
 
+  function handleSaved(newHistory: PracticeRecord[]) {
+    setHistory(newHistory)
+  }
+
+  function handleSelectRecord(record: PracticeRecord) {
+    setMode(record.mode)
+    setDraft(record.draft)
+    setFeedback(record.feedback)
+  }
+
   return (
     <div>
       <ModePicker mode={mode} onModeChange={handleModeChange} />
@@ -48,8 +60,14 @@ export default function App() {
       </button>
       {feedbackError && <p role="alert">{feedbackError}</p>}
       <FeedbackPanel feedback={feedback} />
-      <SavePracticeButton />
-      <HistoryList />
+      <SavePracticeButton
+        draft={draft}
+        mode={mode}
+        prompt={prompt}
+        feedback={feedback}
+        onSaved={handleSaved}
+      />
+      <HistoryList history={history} onSelect={handleSelectRecord} />
     </div>
   )
 }

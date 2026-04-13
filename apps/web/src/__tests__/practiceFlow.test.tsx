@@ -74,3 +74,54 @@ it('shows error when saving empty draft', async () => {
   await user.click(screen.getByRole('button', { name: /save practice/i }))
   expect(await screen.findByText(/writing text is required/i)).toBeInTheDocument()
 })
+
+it('shows all three mode buttons', () => {
+  render(<App />)
+  expect(screen.getByRole('button', { name: /thesis drill/i })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /paragraph drill/i })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /mini essay drill/i })).toBeInTheDocument()
+})
+
+it('check paragraph button triggers paragraph-level feedback', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          feedback: [
+            {
+              level: 'paragraph',
+              targetText: 'test',
+              strengths: ['well structured paragraph'],
+              issues: [],
+              revisionHint: 'none',
+            },
+          ],
+        }),
+        { status: 200 },
+      ),
+    ) as unknown as typeof fetch,
+  )
+
+  const user = userEvent.setup()
+  render(<App />)
+  await user.type(screen.getByLabelText(/writing draft/i), 'Some paragraph text.')
+  await user.click(screen.getByRole('button', { name: /check paragraph/i }))
+  expect(await screen.findByText(/well structured paragraph/i)).toBeInTheDocument()
+})
+
+it('shows error banner and preserves draft when API fails', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => new Response('Server Error', { status: 500 })) as unknown as typeof fetch,
+  )
+
+  const user = userEvent.setup()
+  render(<App />)
+  await user.type(screen.getByLabelText(/writing draft/i), 'My draft.')
+  await user.click(screen.getByRole('button', { name: /check sentence/i }))
+
+  expect(await screen.findByRole('alert')).toBeInTheDocument()
+  // Draft is preserved
+  expect(screen.getByLabelText(/writing draft/i)).toHaveValue('My draft.')
+})

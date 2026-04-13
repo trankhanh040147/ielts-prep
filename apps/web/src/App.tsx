@@ -42,6 +42,19 @@ export default function App() {
     }
   }
 
+  async function handleCheckParagraph() {
+    setLoading(true)
+    setFeedbackError(null)
+    try {
+      const result = await requestFeedback({ mode, level: 'paragraph', text: draft, prompt })
+      setFeedback(result.feedback ?? [])
+    } catch {
+      setFeedbackError('Feedback service unavailable. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   function handleSaved(newHistory: PracticeRecord[]) {
     setHistory(newHistory)
   }
@@ -60,6 +73,9 @@ export default function App() {
       <DraftEditor draft={draft} onChange={setDraft} />
       <button onClick={handleCheckSentence} disabled={loading}>
         {loading ? 'Checking...' : 'Check Sentence'}
+      </button>
+      <button onClick={handleCheckParagraph} disabled={loading}>
+        {loading ? 'Checking...' : 'Check Paragraph'}
       </button>
       {feedbackError && <p role="alert">{feedbackError}</p>}
       <FeedbackPanel feedback={feedback} />

@@ -34,6 +34,11 @@ it('runs thesis mode sentence feedback flow', async () => {
   await user.click(screen.getByRole('button', { name: /check sentence/i }))
 
   expect(await screen.findByText(/clear thesis/i)).toBeInTheDocument()
+
+  // Verify the API was called with level: 'sentence'
+  const fetchMock = vi.mocked(fetch)
+  const callBody = JSON.parse(fetchMock.mock.calls[0][1]?.body as string)
+  expect(callBody.level).toBe('sentence')
 })
 
 it('saves practice and reloads from history', async () => {
@@ -108,6 +113,11 @@ it('check paragraph button triggers paragraph-level feedback', async () => {
   await user.type(screen.getByLabelText(/writing draft/i), 'Some paragraph text.')
   await user.click(screen.getByRole('button', { name: /check paragraph/i }))
   expect(await screen.findByText(/well structured paragraph/i)).toBeInTheDocument()
+
+  // Verify the API was called with level: 'paragraph'
+  const fetchMock = vi.mocked(fetch)
+  const callBody = JSON.parse(fetchMock.mock.calls[0][1]?.body as string)
+  expect(callBody.level).toBe('paragraph')
 })
 
 it('shows error banner and preserves draft when API fails', async () => {

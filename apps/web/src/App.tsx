@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { PracticeMode, FeedbackUnit, PracticeRecord } from './types'
+import type { PracticeMode, FeedbackLevel, FeedbackUnit, PracticeRecord } from './types'
 import { requestFeedback } from './lib/api'
 import { PROMPT_BANK } from './lib/promptBank'
 import { loadHistory } from './lib/storage'
@@ -29,24 +29,11 @@ export default function App() {
     setSessionId(crypto.randomUUID())
   }
 
-  async function handleCheckSentence() {
+  async function handleCheck(level: FeedbackLevel) {
     setLoading(true)
     setFeedbackError(null)
     try {
-      const result = await requestFeedback({ mode, level: 'sentence', text: draft, prompt })
-      setFeedback(result.feedback ?? [])
-    } catch {
-      setFeedbackError('Feedback service unavailable. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function handleCheckParagraph() {
-    setLoading(true)
-    setFeedbackError(null)
-    try {
-      const result = await requestFeedback({ mode, level: 'paragraph', text: draft, prompt })
+      const result = await requestFeedback({ mode, level, text: draft, prompt })
       setFeedback(result.feedback ?? [])
     } catch {
       setFeedbackError('Feedback service unavailable. Please try again.')
@@ -71,10 +58,10 @@ export default function App() {
       <ModePicker mode={mode} onModeChange={handleModeChange} />
       <PromptCard prompt={prompt} />
       <DraftEditor draft={draft} onChange={setDraft} />
-      <button onClick={handleCheckSentence} disabled={loading}>
+      <button onClick={() => handleCheck('sentence')} disabled={loading}>
         {loading ? 'Checking...' : 'Check Sentence'}
       </button>
-      <button onClick={handleCheckParagraph} disabled={loading}>
+      <button onClick={() => handleCheck('paragraph')} disabled={loading}>
         {loading ? 'Checking...' : 'Check Paragraph'}
       </button>
       {feedbackError && <p role="alert">{feedbackError}</p>}

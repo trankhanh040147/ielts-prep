@@ -157,6 +157,83 @@ describe('practice flow', () => {
     expect(await screen.findByText('Clear position statement')).toBeInTheDocument();
   });
 
+  test('trims draft text before sending feedback request', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({ feedback: mockFeedback })
+    } as Response);
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText('Writing draft'), {
+      target: { value: '   This is a thesis sentence.   ' }
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Check sentence' }));
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledWith('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          mode: 'thesis',
+          level: 'sentence',
+          text: 'This is a thesis sentence.',
+          prompt: 'State your opinion clearly in one sentence.'
+        })
+      });
+    });
+  });
+
+  test('keeps latest response when an older request fails later', async () => {
+    let rejectFirstRequest: (error?: unknown) => void = () => undefined;
+    const latestFeedback = [
+      {
+        level: 'paragraph' as const,
+        targetText: 'This is a new paragraph draft.',
+        strengths: ['Strong topic sentence'],
+        issues: ['Needs one more example'],
+        revisionHint: 'Add a concrete supporting detail.'
+      }
+    ];
+
+    vi.spyOn(globalThis, 'fetch')
+      .mockImplementationOnce(() => {
+        return new Promise((_, reject) => {
+          rejectFirstRequest = reject;
+        });
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ feedback: latestFeedback })
+      } as Response);
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText('Writing draft'), {
+      target: { value: 'This is a thesis sentence.' }
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Check sentence' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Paragraph drill' }));
+
+    fireEvent.change(screen.getByLabelText('Writing draft'), {
+      target: { value: 'This is a new paragraph draft.' }
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Check paragraph' }));
+
+    expect(await screen.findByText('Strong topic sentence')).toBeInTheDocument();
+
+    rejectFirstRequest(new Error('network'));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('Strong topic sentence')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument();
+  });
+
   test('switches mode, clears stale state, and sends check paragraph payload', async () => {
     const fetchSpy = vi
       .spyOn(globalThis, 'fetch')

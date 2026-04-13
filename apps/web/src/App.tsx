@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { DraftEditor } from './components/DraftEditor';
 import { FeedbackPanel } from './components/FeedbackPanel';
@@ -25,10 +25,17 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [lastRequest, setLastRequest] = useState<FeedbackRequest | null>(null);
+  const latestRequestId = useRef(0);
 
   const prompt = useMemo(() => promptBank[mode], [mode]);
 
+  const invalidateInFlightRequest = () => {
+    latestRequestId.current += 1;
+    setLoading(false);
+  };
+
   const handleModeChange = (nextMode: PracticeMode) => {
+    invalidateInFlightRequest();
     setMode(nextMode);
     setFeedback(null);
     setError(null);
@@ -37,6 +44,9 @@ function App() {
   };
 
   const runFeedbackRequest = async (request: FeedbackRequest) => {
+    const requestId = latestRequestId.current + 1;
+    latestRequestId.current = requestId;
+
     setLastRequest(null);
     setLoading(true);
     setFeedback(null);
@@ -45,19 +55,33 @@ function App() {
 
     try {
       const nextFeedback = await postFeedback(request);
+
+      if (requestId !== latestRequestId.current) {
+        return;
+      }
+
       setFeedback(nextFeedback);
       setLastRequest(null);
     } catch {
+      if (requestId !== latestRequestId.current) {
+        return;
+      }
+
       setError('Feedback service unavailable');
       setFeedback(null);
       setLastRequest(request);
     } finally {
-      setLoading(false);
+      if (requestId === latestRequestId.current) {
+        setLoading(false);
+      }
     }
   };
 
   const handleCheck = async (level: FeedbackLevel) => {
-    if (!draft.trim()) {
+    const trimmedDraft = draft.trim();
+
+    if (!trimmedDraft) {
+      invalidateInFlightRequest();
       setFeedback(null);
       setError('Please write a draft before checking.');
       setLastRequest(null);
@@ -67,7 +91,7 @@ function App() {
     await runFeedbackRequest({
       mode,
       level,
-      text: draft,
+      text: trimmedDraft,
       prompt
     });
   };
@@ -107,6 +131,7 @@ function App() {
   };
 
   const handleHistorySelect = (record: PracticeRecord) => {
+    invalidateInFlightRequest();
     setActiveRecordId(record.id);
     setMode(record.mode);
     setDraft(record.draft);

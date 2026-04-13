@@ -2,12 +2,22 @@ import type { FeedbackUnit, PracticeRecord } from '../types';
 
 export const STORAGE_KEY = 'ieltsPrep.v0.1.history';
 
+const VALID_MODES = new Set(['thesis', 'paragraph', 'miniEssay']);
+
 const newestFirst = (left: PracticeRecord, right: PracticeRecord) => {
   return new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime();
 };
 
 const isStringArray = (value: unknown): value is string[] => {
   return Array.isArray(value) && value.every((item) => typeof item === 'string');
+};
+
+const isValidDateString = (value: string): boolean => {
+  return !Number.isNaN(Date.parse(value));
+};
+
+const isPracticeMode = (value: unknown): value is PracticeRecord['mode'] => {
+  return typeof value === 'string' && VALID_MODES.has(value);
 };
 
 const isFeedbackUnit = (value: unknown): value is FeedbackUnit => {
@@ -33,12 +43,13 @@ const isPracticeRecord = (value: unknown): value is PracticeRecord => {
   const record = value as Partial<PracticeRecord>;
   return (
     typeof record.id === 'string' &&
-    typeof record.mode === 'string' &&
+    isPracticeMode(record.mode) &&
     typeof record.prompt === 'string' &&
     typeof record.draft === 'string' &&
     Array.isArray(record.feedback) &&
     record.feedback.every(isFeedbackUnit) &&
-    typeof record.updatedAt === 'string'
+    typeof record.updatedAt === 'string' &&
+    isValidDateString(record.updatedAt)
   );
 };
 
@@ -61,6 +72,12 @@ export function loadHistory(): PracticeRecord[] {
 }
 
 export function savePractice(record: PracticeRecord): PracticeRecord[] {
+  if (!isPracticeRecord(record)) {
+    throw new Error(
+      'Invalid practice record: expected id/mode/prompt/draft/feedback/updatedAt with a valid mode and date'
+    );
+  }
+
   if (!record.draft.trim()) {
     throw new Error('Writing text is required');
   }

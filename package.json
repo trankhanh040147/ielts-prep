@@ -1,13 +1,23 @@
 {
   "name": "ielts-prep",
   "private": true,
+  "packageManager": "npm@10.9.0",
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  },
   "workspaces": [
     "apps/api",
     "apps/web"
   ],
   "scripts": {
     "test": "npm run -w apps/api test && npm run -w apps/web test",
-    "dev": "npm run -w apps/api dev",
+    "dev:api": "npm run -w apps/api dev",
+    "dev:web": "npm run -w apps/web dev",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev:api\" \"npm run dev:web\"",
     "build": "npm run -w apps/api build && npm run -w apps/web build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }

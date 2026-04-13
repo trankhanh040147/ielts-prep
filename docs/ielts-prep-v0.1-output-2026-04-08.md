@@ -1,21 +1,12 @@
-# IELTS Prep v0.1 Output Log (updated 2026-04-12)
+# IELTS Prep v0.1 Output Log (dated compatibility note)
 
-This file records command evidence captured in this worktree.
+This dated file is kept for backward compatibility with older references.
 
-## Automated test evidence
+For the current and continuously updated verification evidence, use:
 
-### `npm run -w apps/web test -- src/__tests__/practiceFlow.test.tsx`
-- Result: PASS
-- Test file: `apps/web/src/__tests__/practiceFlow.test.tsx`
-- Tests: 5 passed
+- `docs/ielts-prep-v0.1-output-latest.md`
 
-### `npm test`
-- Root script now runs API then web suites.
-- API (`apps/api`): 4 files passed, 18 tests passed.
-- Web (`apps/web`): 2 files passed, 8 tests passed.
-- Note: web test run prints Node warning: ``--localstorage-file was provided without a valid path``.
+Historical note:
 
-## Scope of this log
-
-- Contains only automated command evidence from this implementation session.
-- No manual browser/demo claims are included.
+- Earlier in the 2026-04-13 hardening cycle, `npm run build` failed due web TypeScript test typing errors.
+- Those issues were fixed later the same day; current source of truth is `docs/ielts-prep-v0.1-output-latest.md`.

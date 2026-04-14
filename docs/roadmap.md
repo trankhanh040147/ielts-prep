@@ -20,7 +20,7 @@
 - [ ] Keyboard/touch support for mode info (currently hover-only)
 
 ### Practice Quality
-- [ ] Expand prompt bank — multiple prompts per mode, random selection
+- [ ] Expand prompt bank — multiple prompts per mode, random selection. Or generated with AI.
 - [ ] Feedback diff view — highlight revised sentences against original draft
 - [ ] Word count indicator in editor
 

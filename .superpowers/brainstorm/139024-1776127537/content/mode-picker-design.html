@@ -1,0 +1,173 @@
+<h2>ModePicker — thiết kế cuối</h2>
+<p class="subtitle">Hover vào từng button để xem info panel hiện ra bên dưới</p>
+
+<div class="mockup">
+  <div class="mockup-header">ModePicker Component</div>
+  <div class="mockup-body">
+    <style>
+      .demo-mode-picker { font-family: sans-serif; }
+      .demo-buttons { display: flex; gap: 8px; margin-bottom: 0; }
+      .demo-btn {
+        padding: 8px 18px;
+        border-radius: 6px;
+        border: 1px solid #2d3148;
+        background: #1a1d2e;
+        color: #9ca3af;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .demo-btn.active {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: #fff;
+      }
+      .demo-btn:hover { border-color: #6366f1; color: #c7d2fe; }
+
+      .demo-info-panel {
+        margin-top: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease;
+        opacity: 0;
+        background: #1e2130;
+        border-radius: 0 0 8px 8px;
+        border: 1px solid #2d3148;
+        border-top: none;
+      }
+      .demo-buttons-wrapper:hover + .demo-info-panel,
+      .demo-info-panel:hover {
+        max-height: 200px;
+        margin-top: 0;
+        opacity: 1;
+      }
+
+      .demo-info-inner { padding: 14px 16px; display: flex; gap: 24px; }
+      .demo-info-section { flex: 1; }
+      .demo-info-label {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: 5px;
+      }
+      .demo-info-text { font-size: 11px; color: #d1d5db; line-height: 1.5; }
+      .demo-info-example {
+        font-size: 11px;
+        color: #a5b4fc;
+        font-style: italic;
+        border-left: 2px solid #6366f1;
+        padding-left: 8px;
+        line-height: 1.5;
+      }
+      .demo-wrapper { background: #0f1117; border-radius: 8px; padding: 20px; }
+
+      /* Individual button hover — show specific panel */
+      .demo-btn-thesis:hover ~ .demo-panels .demo-panel { display: none; }
+      .demo-btn-thesis:hover ~ .demo-panels .demo-panel-thesis { display: flex; }
+      .demo-btn-para:hover ~ .demo-panels .demo-panel { display: none; }
+      .demo-btn-para:hover ~ .demo-panels .demo-panel-para { display: flex; }
+      .demo-btn-mini:hover ~ .demo-panels .demo-panel { display: none; }
+      .demo-btn-mini:hover ~ .demo-panels .demo-panel-mini { display: flex; }
+
+      .demo-panels {
+        border: 1px solid #2d3148;
+        border-radius: 0 0 8px 8px;
+        background: #1e2130;
+        overflow: hidden;
+      }
+      .demo-panel {
+        display: none;
+        gap: 20px;
+        padding: 14px 16px;
+        animation: fadeIn .15s ease;
+      }
+      /* default show thesis */
+      .demo-wrapper:not(:hover) .demo-panel-thesis { display: flex; }
+
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+      .demo-col { flex: 1; }
+      .demo-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+      .demo-body { font-size: 11px; color: #d1d5db; line-height: 1.5; }
+      .demo-ex { font-size: 11px; color: #a5b4fc; font-style: italic; border-left: 2px solid #6366f1; padding-left: 8px; line-height: 1.5; }
+      .demo-criteria { font-size: 11px; color: #d1d5db; line-height: 1.6; }
+      .demo-criteria li { margin-bottom: 2px; }
+      .tag-yellow { color: #f59e0b; }
+      .tag-green { color: #10b981; }
+    </style>
+
+    <div class="demo-wrapper">
+      <!-- Buttons on top edge of panel -->
+      <div style="display:flex;gap:8px;position:relative;z-index:1;">
+        <button class="demo-btn active demo-btn-thesis" style="border-radius:6px 6px 0 0;border-bottom:none;">Thesis Drill</button>
+        <button class="demo-btn demo-btn-para" style="border-radius:6px 6px 0 0;border-bottom:none;">Paragraph Drill</button>
+        <button class="demo-btn demo-btn-mini" style="border-radius:6px 6px 0 0;border-bottom:none;">Mini Essay Drill</button>
+      </div>
+
+      <div class="demo-panels">
+        <!-- Thesis panel -->
+        <div class="demo-panel demo-panel-thesis">
+          <div class="demo-col">
+            <div class="demo-lbl" style="color:#6366f1;">Thesis Drill</div>
+            <div class="demo-body">Luyện viết câu luận điểm — phần cốt lõi của phần mở bài. Bạn đọc đề, xác định dạng câu hỏi, rồi viết 1–2 câu thesis thể hiện rõ lập trường.</div>
+          </div>
+          <div class="demo-col">
+            <div class="demo-lbl tag-green">Tiêu chí đánh giá</div>
+            <ul class="demo-criteria" style="margin:0;padding-left:16px;">
+              <li>Trả lời thẳng câu hỏi đề bài</li>
+              <li>Lập trường rõ ràng, nhất quán</li>
+              <li>Không quá chung chung</li>
+            </ul>
+          </div>
+          <div class="demo-col">
+            <div class="demo-lbl tag-yellow">Ví dụ tốt</div>
+            <div class="demo-ex">"While railways suit long-distance travel, roads remain vital locally, and governments should fund both proportionally."</div>
+          </div>
+        </div>
+
+        <!-- Paragraph panel -->
+        <div class="demo-panel demo-panel-para">
+          <div class="demo-col">
+            <div class="demo-lbl" style="color:#6366f1;">Paragraph Drill</div>
+            <div class="demo-body">Luyện viết 1 đoạn thân bài hoàn chỉnh theo cấu trúc: topic sentence → lập luận → ví dụ → kết đoạn.</div>
+          </div>
+          <div class="demo-col">
+            <div class="demo-lbl tag-green">Tiêu chí đánh giá</div>
+            <ul class="demo-criteria" style="margin:0;padding-left:16px;">
+              <li>Topic sentence bám đề</li>
+              <li>Lập luận logic, có dẫn chứng</li>
+              <li>Kết đoạn liên kết ý chính</li>
+            </ul>
+          </div>
+          <div class="demo-col">
+            <div class="demo-lbl tag-yellow">Ví dụ tốt</div>
+            <div class="demo-ex">"One key advantage of railways is their capacity to reduce urban congestion. By transporting large volumes..."</div>
+          </div>
+        </div>
+
+        <!-- Mini Essay panel -->
+        <div class="demo-panel demo-panel-mini">
+          <div class="demo-col">
+            <div class="demo-lbl" style="color:#6366f1;">Mini Essay Drill</div>
+            <div class="demo-body">Luyện viết bài ngắn đầy đủ cấu trúc (~200 từ): intro có thesis, 1–2 body paragraph, conclusion tóm gọn.</div>
+          </div>
+          <div class="demo-col">
+            <div class="demo-lbl tag-green">Tiêu chí đánh giá</div>
+            <ul class="demo-criteria" style="margin:0;padding-left:16px;">
+              <li>Cấu trúc bài rõ ràng</li>
+              <li>Coherence & cohesion tốt</li>
+              <li>Thesis — body — conclusion khớp nhau</li>
+            </ul>
+          </div>
+          <div class="demo-col">
+            <div class="demo-lbl tag-yellow">Ví dụ tốt</div>
+            <div class="demo-ex">"In conclusion, while both transport modes have merits, a balanced investment strategy would better serve diverse populations."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Hover vào từng button trong mockup ở trên để xem panel thay đổi. Bạn thấy ổn chưa?</p>

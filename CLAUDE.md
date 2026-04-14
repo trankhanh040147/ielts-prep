@@ -30,6 +30,8 @@ npm --workspace apps/web run test    # Web tests only
 
 Environment: copy `.env.example` to `.env` in `apps/api/` and set `GEMINI_API_KEY`. Optional: `GEMINI_MODEL` (defaults to `gemini-1.5-flash`).
 
+> **Known issue:** `gemini-1.5-flash` and `gemini-2.0-flash` are no longer available for new API keys. Use `gemini-2.5-flash` instead. Set `GEMINI_MODEL=gemini-2.5-flash` in `apps/api/.env`.
+
 ## Architecture
 
 ### Data flow
@@ -79,6 +81,24 @@ type PracticeRecord = {
 - **Error handling:** Empty drafts rejected inline; API failures show a non-blocking retry banner; draft state is preserved on all errors; invalid Gemini output returns fallback structured feedback.
 - **Persistence:** All history lives in localStorage — no backend DB.
 - **Testing:** Vitest for both workspaces; `@testing-library/react` for components; Supertest for HTTP routes. Follow test-first approach per implementation plan.
+
+## Known Issues & Fixes
+
+### `npm run dev` không load `.env` (API server)
+
+**Vấn đề:** `app.ts` không dùng `dotenv`, nên `GEMINI_API_KEY` không được đọc khi chạy `npm run dev` từ root.
+
+**Fix đã áp dụng:** `apps/api/package.json` script `dev` dùng `tsx watch --env-file=.env src/index.ts`. Nếu chạy thủ công từ `apps/api/`, cũng phải thêm flag đó.
+
+**Nếu server không nhận env sau restart:** Kill process cũ trước (`kill $(lsof -ti :3001)`), rồi chạy lại từ đúng thư mục `apps/api/`.
+
+### Gemini model `gemini-1.5-flash` / `gemini-2.0-flash` không còn available
+
+**Vấn đề:** Các model cũ (1.5-flash, 2.0-flash) trả về 404 với API key mới.
+
+**Fix:** Set `GEMINI_MODEL=gemini-2.5-flash` trong `apps/api/.env`.
+
+---
 
 ## Reference Docs
 

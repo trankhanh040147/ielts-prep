@@ -13,7 +13,7 @@ type GeminiFeedbackResponse = {
   feedback: unknown[];
 };
 
-const DEFAULT_MODEL = 'gemini-1.5-flash';
+const DEFAULT_MODEL = 'gemini-3-flash-preview';
 
 const toGeminiPrompt = ({ mode, level, text, prompt }: GeminiFeedbackInput): string => {
   return [

@@ -36,9 +36,14 @@ export function SavePracticeButton({ draft, mode, prompt, feedback, sessionId, o
   }
 
   return (
-    <div>
-      <button onClick={handleSave}>Save Practice</button>
-      {error && <p role="alert">{error}</p>}
+    <div className="mt-4">
+      <button
+        onClick={handleSave}
+        className="w-full sm:w-auto px-4 py-2 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
+      >
+        Save Practice
+      </button>
+      {error && <p role="alert" className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
   )
 }

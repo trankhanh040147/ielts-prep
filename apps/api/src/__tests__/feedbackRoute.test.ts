@@ -33,8 +33,9 @@ describe('POST /api/feedback', () => {
     expect(res.status).toBe(200)
     expect(Array.isArray(res.body.feedback)).toBe(true)
     expect(res.body.feedback[0].level).toBe('sentence')
-    expect(res.body.feedback[0].revision.explanation).toBeDefined()
+    expect(res.body.feedback[0].revision.explanation).toBe('Tighten the verb phrase for concision.')
     expect(Array.isArray(res.body.feedback[0].revision.rewrites)).toBe(true)
+    expect(res.body.feedback[0].revision.rewrites.length).toBeGreaterThan(0)
   })
 
   it('returns 400 for invalid request', async () => {

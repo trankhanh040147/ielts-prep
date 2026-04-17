@@ -19,8 +19,8 @@ export async function getGeminiFeedback(input: GeminiInput): Promise<unknown> {
 
   const sentenceRule =
     input.level === 'sentence'
-      ? 'Return ONE feedback object per sentence in the text. The "targetText" field MUST be the exact sentence copied verbatim — not the whole paragraph.'
-      : 'Return ONE feedback object covering the whole text. Set "targetText" to the full submitted text.'
+      ? 'Return exactly ONE feedback object per sentence in the text. The "targetText" field MUST be the exact sentence copied verbatim — not the whole paragraph. The "feedback" array must have one entry per sentence.'
+      : 'Return exactly ONE feedback object in the "feedback" array covering the whole text. Set "targetText" to the full submitted text.'
 
   const instruction = [
     'You are an IELTS writing coach. Return strict JSON only — no markdown, no text outside JSON.',
@@ -35,7 +35,7 @@ export async function getGeminiFeedback(input: GeminiInput): Promise<unknown> {
 
   const result = await model.generateContent(instruction)
   const text = result.response.text()
-  const cleaned = text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim()
+  const cleaned = text.trimStart().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim()
 
   try {
     return JSON.parse(cleaned)

@@ -8,3 +8,4 @@ coverage/
 *.log
 *.local
 .DS_Store
+.superpowers/

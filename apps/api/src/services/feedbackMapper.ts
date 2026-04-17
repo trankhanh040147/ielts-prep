@@ -1,10 +1,5 @@
 import type { FeedbackLevel, FeedbackUnit } from '../types'
 
-const PARSE_FAILURE_REVISION = {
-  explanation: 'Could not parse provider response.',
-  rewrites: [] as string[],
-}
-
 export function mapGeminiToFeedback(raw: unknown, level: FeedbackLevel, fallbackText: string): FeedbackUnit[] {
   const items = (raw as { feedback?: unknown[] })?.feedback
 
@@ -15,7 +10,7 @@ export function mapGeminiToFeedback(raw: unknown, level: FeedbackLevel, fallback
         targetText: fallbackText,
         strengths: ['You addressed the prompt directly.'],
         issues: ['Could not parse provider response.'],
-        revision: PARSE_FAILURE_REVISION,
+        revision: { explanation: 'Could not parse provider response.', rewrites: [] },
       },
     ]
   }

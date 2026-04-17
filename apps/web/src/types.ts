@@ -5,7 +5,10 @@ export type FeedbackUnit = {
   targetText: string
   strengths: string[]
   issues: string[]
-  revisionHint: string
+  revision: {
+    explanation: string
+    rewrites: string[]
+  }
 }
 export type PracticeRecord = {
   id: string

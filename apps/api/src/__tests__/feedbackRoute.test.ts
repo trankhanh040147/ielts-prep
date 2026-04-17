@@ -4,7 +4,20 @@ import { app } from '../app'
 
 vi.mock('../services/geminiClient', () => ({
   getGeminiFeedback: vi.fn(async () => ({
-    feedback: [{ strengths: ['clear thesis'], issues: ['minor grammar'], revisionHint: 'tighten verbs' }],
+    feedback: [
+      {
+        targetText: 'Governments should invest in rail.',
+        strengths: ['clear thesis'],
+        issues: ['minor grammar'],
+        revision: {
+          explanation: 'Tighten the verb phrase for concision.',
+          rewrites: [
+            'Governments ought to invest substantially in rail infrastructure.',
+            'Rail investment should be a government priority.',
+          ],
+        },
+      },
+    ],
   })),
 }))
 
@@ -20,6 +33,8 @@ describe('POST /api/feedback', () => {
     expect(res.status).toBe(200)
     expect(Array.isArray(res.body.feedback)).toBe(true)
     expect(res.body.feedback[0].level).toBe('sentence')
+    expect(res.body.feedback[0].revision.explanation).toBeDefined()
+    expect(Array.isArray(res.body.feedback[0].revision.rewrites)).toBe(true)
   })
 
   it('returns 400 for invalid request', async () => {

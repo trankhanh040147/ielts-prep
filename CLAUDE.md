@@ -67,7 +67,10 @@ type FeedbackUnit = {
   targetText: string
   strengths: string[]
   issues: string[]
-  revisionHint: string
+  revision: {
+    explanation: string   // why it's weak + the principle to fix it
+    rewrites: string[]    // 2–3 concrete alternative sentences
+  }
 }
 type PracticeRecord = {
   id: string; mode: PracticeMode; prompt: string

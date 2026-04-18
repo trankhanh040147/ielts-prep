@@ -12,16 +12,16 @@
 
 ---
 
-## v0.2 — Next
+## v0.2 — In Progress
 
 ### UX & Onboarding
-- [ ] Styling — apply a design system (Tailwind or CSS modules); currently unstyled
-- [ ] Mobile-friendly layout
-- [ ] Keyboard/touch support for mode info (currently hover-only)
+- [x] Styling — Tailwind CSS v4 applied across all components
+- [x] Mobile-friendly layout — single column on mobile, two-column on desktop
+- [x] Keyboard/touch support for mode info — `?` button toggles info panel (was hover-only)
 
 ### Practice Quality
 - [ ] Expand prompt bank — multiple prompts per mode, random selection. Or generated with AI.
-- [ ] Feedback diff view — highlight revised sentences against original draft
+- [ ] **Next:** Feedback diff view — highlight revised sentences against original draft
 - [ ] Word count indicator in editor
 
 ### Feedback & Scoring

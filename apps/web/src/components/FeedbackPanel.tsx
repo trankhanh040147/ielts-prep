@@ -1,10 +1,12 @@
 import type { FeedbackUnit } from '../types'
+import { RewriteDiff } from './RewriteDiff'
 
 interface FeedbackPanelProps {
   feedback: FeedbackUnit[]
+  draft: string
 }
 
-export function FeedbackPanel({ feedback }: FeedbackPanelProps) {
+export function FeedbackPanel({ feedback, draft }: FeedbackPanelProps) {
   if (feedback.length === 0) return null
 
   return (
@@ -42,13 +44,11 @@ export function FeedbackPanel({ feedback }: FeedbackPanelProps) {
                 <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">
                   Alternative Rewrites
                 </p>
-                <ul className="space-y-1.5">
-                  {unit.revision.rewrites.map((r, j) => (
-                    <li key={j} className="text-sm italic text-indigo-800 bg-indigo-50 rounded px-2.5 py-1.5">
-                      ✏ {r}
-                    </li>
-                  ))}
-                </ul>
+                <RewriteDiff
+                  targetText={unit.targetText}
+                  rewrites={unit.revision.rewrites}
+                  draft={draft}
+                />
               </>
             )}
           </div>

@@ -99,7 +99,7 @@ export default function App() {
 
           <div>
             <div className="sticky top-6">
-              <FeedbackPanel feedback={feedback} />
+              <FeedbackPanel feedback={feedback} draft={draft} />
               <HistoryList history={history} onSelect={handleSelectRecord} />
             </div>
           </div>

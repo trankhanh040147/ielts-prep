@@ -35,6 +35,7 @@ export function RewriteDiff({ targetText, rewrites, draft }: RewriteDiffProps) {
       <div className="flex gap-1 mb-2">
         {rewrites.map((_, i) => (
           <button
+            type="button"
             key={i}
             onClick={() => setActiveIndex(i)}
             aria-pressed={activeIndex === i}

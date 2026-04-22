@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { loadHistory, savePractice, renameRecord } from '../lib/storage'
+import { loadHistory, savePractice, renameRecord, deleteRecord } from '../lib/storage'
 
 const STORAGE_KEY = 'ieltsPrep.v0.1.history'
 
@@ -107,5 +107,32 @@ describe('renameRecord', () => {
     const result = renameRecord('missing', 'New Name')
     expect(result).toHaveLength(1)
     expect(result[0].topicName).toBe('Name')
+  })
+})
+
+describe('deleteRecord', () => {
+  it('removes the matching record and returns updated array', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify([
+        { id: 'a', mode: 'thesis', topicName: 'T1', prompt: 'p', draft: 'd', feedback: [], updatedAt: '2026-01-01T00:00:00.000Z' },
+        { id: 'b', mode: 'paragraph', topicName: 'T2', prompt: 'p', draft: 'd', feedback: [], updatedAt: '2026-01-01T00:00:00.000Z' },
+      ]),
+    )
+    const result = deleteRecord('a')
+    expect(result).toHaveLength(1)
+    expect(result[0].id).toBe('b')
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toHaveLength(1)
+  })
+
+  it('returns unchanged array when id not found', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify([
+        { id: 'a', mode: 'thesis', topicName: 'T1', prompt: 'p', draft: 'd', feedback: [], updatedAt: '2026-01-01T00:00:00.000Z' },
+      ]),
+    )
+    const result = deleteRecord('missing')
+    expect(result).toHaveLength(1)
   })
 })

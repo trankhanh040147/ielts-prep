@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { PracticeMode, FeedbackLevel, FeedbackUnit, PracticeRecord } from './types'
 import { requestFeedback } from './lib/api'
 import { PROMPT_BANK } from './lib/promptBank'
-import { loadHistory, renameRecord } from './lib/storage'
+import { loadHistory, renameRecord, deleteRecord } from './lib/storage'
 import { ModePicker } from './components/ModePicker'
 import { TopicPicker } from './components/TopicPicker'
 import { PromptCard } from './components/PromptCard'
@@ -68,7 +68,7 @@ export default function App() {
   }
 
   function handleDeleteRecord(id: string) {
-    setHistory((prev) => prev.filter((r) => r.id !== id))
+    setHistory(deleteRecord(id))
   }
 
   return (

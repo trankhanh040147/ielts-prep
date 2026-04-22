@@ -42,3 +42,10 @@ export function renameRecord(id: string, newName: string): PracticeRecord[] {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
   return updated
 }
+
+export function deleteRecord(id: string): PracticeRecord[] {
+  const records = loadHistory()
+  const updated = records.filter((r) => r.id !== id)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+  return updated
+}

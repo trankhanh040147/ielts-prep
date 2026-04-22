@@ -44,7 +44,7 @@ export async function getGeminiFeedback(input: GeminiInput): Promise<unknown> {
   }
 }
 
-export async function generateTopic(mode: string): Promise<{ prompt: string; topicName: string }> {
+export async function generateTopic(mode: PracticeMode): Promise<{ prompt: string; topicName: string }> {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error('Missing GEMINI_API_KEY')
 
@@ -56,14 +56,19 @@ Respond with JSON only, no explanation: { "prompt": "<full question>", "topicNam
 The topicName should be a short label suitable for a history list entry.`
 
   const result = await model.generateContent(geminiPrompt)
-  const text = result.response.text().trim()
+  const text = result.response.text()
+  const jsonText = text.trimStart().replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim()
 
-  // Strip markdown code fences if present
-  const jsonText = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
-  const parsed = JSON.parse(jsonText)
-
-  if (typeof parsed.prompt !== 'string' || typeof parsed.topicName !== 'string') {
-    throw new Error('Invalid topic response shape')
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(jsonText)
+  } catch {
+    throw new Error('generateTopic: invalid JSON from Gemini')
   }
-  return { prompt: parsed.prompt, topicName: parsed.topicName }
+
+  const p = parsed as Record<string, unknown>
+  if (typeof p.prompt !== 'string' || typeof p.topicName !== 'string') {
+    throw new Error('generateTopic: unexpected response shape')
+  }
+  return { prompt: p.prompt, topicName: p.topicName }
 }

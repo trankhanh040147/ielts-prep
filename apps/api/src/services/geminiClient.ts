@@ -43,3 +43,27 @@ export async function getGeminiFeedback(input: GeminiInput): Promise<unknown> {
     return {}
   }
 }
+
+export async function generateTopic(mode: string): Promise<{ prompt: string; topicName: string }> {
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) throw new Error('Missing GEMINI_API_KEY')
+
+  const client = new GoogleGenerativeAI(apiKey)
+  const model = client.getGenerativeModel({ model: modelName })
+
+  const geminiPrompt = `Generate one IELTS Academic Writing Task 2 question for the practice mode: "${mode}".
+Respond with JSON only, no explanation: { "prompt": "<full question>", "topicName": "<max 5 words>" }
+The topicName should be a short label suitable for a history list entry.`
+
+  const result = await model.generateContent(geminiPrompt)
+  const text = result.response.text().trim()
+
+  // Strip markdown code fences if present
+  const jsonText = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+  const parsed = JSON.parse(jsonText)
+
+  if (typeof parsed.prompt !== 'string' || typeof parsed.topicName !== 'string') {
+    throw new Error('Invalid topic response shape')
+  }
+  return { prompt: parsed.prompt, topicName: parsed.topicName }
+}

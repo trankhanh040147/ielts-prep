@@ -19,7 +19,7 @@ export default function App() {
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory())
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID())
 
-  const prompt = PROMPT_BANK[mode][0]
+  const { prompt, topicName } = PROMPT_BANK[mode][0]
 
   function handleModeChange(newMode: PracticeMode) {
     setMode(newMode)
@@ -91,6 +91,7 @@ export default function App() {
               draft={draft}
               mode={mode}
               prompt={prompt}
+              topicName={topicName}
               feedback={feedback}
               sessionId={sessionId}
               onSaved={handleSaved}

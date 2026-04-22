@@ -6,12 +6,13 @@ interface SavePracticeButtonProps {
   draft: string
   mode: PracticeMode
   prompt: string
+  topicName: string
   feedback: FeedbackUnit[]
   sessionId: string
   onSaved: (history: PracticeRecord[]) => void
 }
 
-export function SavePracticeButton({ draft, mode, prompt, feedback, sessionId, onSaved }: SavePracticeButtonProps) {
+export function SavePracticeButton({ draft, mode, prompt, topicName, feedback, sessionId, onSaved }: SavePracticeButtonProps) {
   const [error, setError] = useState<string | null>(null)
 
   function handleSave() {
@@ -21,6 +22,7 @@ export function SavePracticeButton({ draft, mode, prompt, feedback, sessionId, o
         id: sessionId,
         mode,
         prompt,
+        topicName,
         draft,
         feedback,
         updatedAt: new Date().toISOString(),

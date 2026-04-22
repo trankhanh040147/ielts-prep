@@ -14,7 +14,9 @@ export type PracticeRecord = {
   id: string
   mode: PracticeMode
   prompt: string
+  topicName: string
   draft: string
   feedback: FeedbackUnit[]
   updatedAt: string
 }
+export type TopicResponse = { prompt: string; topicName: string }

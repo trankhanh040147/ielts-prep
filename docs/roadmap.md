@@ -12,7 +12,7 @@
 
 ---
 
-## v0.2 — In Progress
+## v0.2 — Done ✅
 
 ### UX & Onboarding
 - [x] Styling — Tailwind CSS v4 applied across all components
@@ -20,8 +20,16 @@
 - [x] Keyboard/touch support for mode info — `?` button toggles info panel (was hover-only)
 
 ### Practice Quality
-- [ ] Expand prompt bank — multiple prompts per mode, random selection. Or generated with AI.
-- [ ] **Next:** Feedback diff view — highlight revised sentences against original draft
+- [x] Feedback diff view — word-level diff per rewrite, tab toggle, draft context
+
+---
+
+## v0.3 — In Progress
+
+### Topic Management
+- [ ] **Next:** Topic picker — AI-generated prompts or user-pasted topic; history stores topic name (user-editable)
+
+### Practice Quality
 - [ ] Word count indicator in editor
 
 ### Feedback & Scoring

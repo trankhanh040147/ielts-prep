@@ -2,8 +2,9 @@ import { useState } from 'react'
 import type { PracticeMode, FeedbackLevel, FeedbackUnit, PracticeRecord } from './types'
 import { requestFeedback } from './lib/api'
 import { PROMPT_BANK } from './lib/promptBank'
-import { loadHistory } from './lib/storage'
+import { loadHistory, renameRecord } from './lib/storage'
 import { ModePicker } from './components/ModePicker'
+import { TopicPicker } from './components/TopicPicker'
 import { PromptCard } from './components/PromptCard'
 import { DraftEditor } from './components/DraftEditor'
 import { FeedbackPanel } from './components/FeedbackPanel'
@@ -12,6 +13,8 @@ import { HistoryList } from './components/HistoryList'
 
 export default function App() {
   const [mode, setMode] = useState<PracticeMode>('thesis')
+  const [prompt, setPrompt] = useState(PROMPT_BANK['thesis'][0].prompt)
+  const [topicName, setTopicName] = useState(PROMPT_BANK['thesis'][0].topicName)
   const [draft, setDraft] = useState('')
   const [feedback, setFeedback] = useState<FeedbackUnit[]>([])
   const [loading, setLoading] = useState(false)
@@ -19,10 +22,15 @@ export default function App() {
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory())
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID())
 
-  const { prompt, topicName } = PROMPT_BANK[mode][0]
+  function handleTopicChange(newPrompt: string, newTopicName: string) {
+    setPrompt(newPrompt)
+    setTopicName(newTopicName)
+  }
 
   function handleModeChange(newMode: PracticeMode) {
     setMode(newMode)
+    setPrompt(PROMPT_BANK[newMode][0].prompt)
+    setTopicName(PROMPT_BANK[newMode][0].topicName)
     setDraft('')
     setFeedback([])
     setFeedbackError(null)
@@ -48,9 +56,19 @@ export default function App() {
 
   function handleSelectRecord(record: PracticeRecord) {
     setMode(record.mode)
+    setPrompt(record.prompt)
+    setTopicName(record.topicName)
     setDraft(record.draft)
     setFeedback(record.feedback)
     setFeedbackError(null)
+  }
+
+  function handleRenameRecord(id: string, newName: string) {
+    setHistory(renameRecord(id, newName))
+  }
+
+  function handleDeleteRecord(id: string) {
+    setHistory((prev) => prev.filter((r) => r.id !== id))
   }
 
   return (
@@ -61,6 +79,14 @@ export default function App() {
           <div>
             <ModePicker mode={mode} onModeChange={handleModeChange} />
             <div className="mt-6">
+              <TopicPicker
+                mode={mode}
+                prompt={prompt}
+                topicName={topicName}
+                onTopicChange={handleTopicChange}
+              />
+            </div>
+            <div className="mt-4">
               <PromptCard prompt={prompt} />
             </div>
             <div className="mt-6">
@@ -101,7 +127,12 @@ export default function App() {
           <div>
             <div className="sticky top-6">
               <FeedbackPanel feedback={feedback} draft={draft} />
-              <HistoryList history={history} onSelect={handleSelectRecord} />
+              <HistoryList
+                history={history}
+                onSelect={handleSelectRecord}
+                onRename={handleRenameRecord}
+                onDelete={handleDeleteRecord}
+              />
             </div>
           </div>
         </main>

@@ -56,8 +56,9 @@ it('saves practice and reloads from history', async () => {
 
   await user.click(screen.getByRole('button', { name: /save practice/i }))
 
-  const historyEntry = await screen.findByRole('button', { name: /—\s*thesis/i })
-  expect(historyEntry).toBeInTheDocument()
+  const entries = await screen.findAllByText('Railways vs Roads')
+  // At least 2: one TopicPicker chip + one HistoryList entry
+  expect(entries.length).toBeGreaterThanOrEqual(2)
 })
 
 it('shows error when saving empty draft', async () => {

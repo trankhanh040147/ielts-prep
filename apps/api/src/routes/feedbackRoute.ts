@@ -22,7 +22,8 @@ feedbackRoute.post('/api/feedback', async (req, res) => {
     const raw = await getGeminiFeedback(parsed.data)
     const feedback = mapGeminiToFeedback(raw, parsed.data.level, parsed.data.text)
     return res.json({ feedback })
-  } catch {
+  } catch (error) {
+    console.error('Feedback API Error:', error)
     return res.status(502).json({ error: 'Feedback service unavailable' })
   }
 })

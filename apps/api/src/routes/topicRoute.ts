@@ -33,7 +33,8 @@ router.post('/', async (req, res) => {
   try {
     const topic = await generateTopic(mode)
     res.json(topic)
-  } catch {
+  } catch (error) {
+    console.warn('Topic generation failed, using fallback:', error)
     res.json(FALLBACK[mode])
   }
 })

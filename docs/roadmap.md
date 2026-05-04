@@ -39,3 +39,9 @@
 ### Infrastructure
 - [ ] Task 1 support (graph/chart/map/process descriptions)
 - [ ] Cloud sync + auth (when local-only becomes a limitation)
+
+--- 
+
+## Backlog
+- B01: Tổng hợp hợp lỗi/notes -> Sau khi hoàn thành mỗi bài, generate những thông tin mà người dùng cần nhớ và chuyển thành bài tập/flashcard/...
+- B02: Ở mỗi từ bị strikethrough trong phần "Alternative Rewrites", hover vào thấy được nguyên nhân, lý do thay thế part cũ = part mới

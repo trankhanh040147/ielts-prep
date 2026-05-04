@@ -18,6 +18,14 @@ vi.mock('../services/geminiClient', () => ({
         },
       },
     ],
+    bandEstimate: {
+      overall: 6.5,
+      taskAchievement: 6,
+      coherenceCohesion: 6.5,
+      lexicalResource: 7,
+      grammaticalRangeAccuracy: 6,
+      summary: 'Clear position with grammar issues.',
+    },
   })),
 }))
 
@@ -36,6 +44,30 @@ describe('POST /api/feedback', () => {
     expect(res.body.feedback[0].revision.explanation).toBe('Tighten the verb phrase for concision.')
     expect(Array.isArray(res.body.feedback[0].revision.rewrites)).toBe(true)
     expect(res.body.feedback[0].revision.rewrites.length).toBeGreaterThan(0)
+    expect(res.body.bandEstimate).toEqual({
+      overall: 6.5,
+      taskAchievement: 6,
+      coherenceCohesion: 6.5,
+      lexicalResource: 7,
+      grammaticalRangeAccuracy: 6,
+      summary: 'Clear position with grammar issues.',
+    })
+  })
+
+  it('omits bandEstimate when provider score is invalid', async () => {
+    const { getGeminiFeedback } = await import('../services/geminiClient')
+    vi.mocked(getGeminiFeedback).mockResolvedValueOnce({ feedback: [], bandEstimate: { overall: 'bad' } })
+
+    const res = await request(app).post('/api/feedback').send({
+      mode: 'thesis',
+      level: 'sentence',
+      text: 'Some text.',
+      prompt: 'Some prompt.',
+    })
+
+    expect(res.status).toBe(200)
+    expect(res.body.feedback).toEqual([])
+    expect(res.body).not.toHaveProperty('bandEstimate')
   })
 
   it('returns 400 for invalid request', async () => {

@@ -1,11 +1,11 @@
-import type { PracticeMode, FeedbackLevel } from '../types'
+import type { PracticeMode, FeedbackLevel, FeedbackResponse } from '../types'
 
 export async function requestFeedback(body: {
   mode: PracticeMode
   level: FeedbackLevel
   text: string
   prompt: string
-}) {
+}): Promise<FeedbackResponse> {
   const res = await fetch('/api/feedback', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

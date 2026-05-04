@@ -1,17 +1,20 @@
-import type { FeedbackUnit } from '../types'
+import type { BandEstimate, FeedbackUnit } from '../types'
+import { BandEstimatePanel } from './BandEstimatePanel'
 import { RewriteDiff } from './RewriteDiff'
 
 interface FeedbackPanelProps {
   feedback: FeedbackUnit[]
   draft: string
+  bandEstimate?: BandEstimate
 }
 
-export function FeedbackPanel({ feedback, draft }: FeedbackPanelProps) {
-  if (feedback.length === 0) return null
+export function FeedbackPanel({ feedback, draft, bandEstimate }: FeedbackPanelProps) {
+  if (feedback.length === 0 && !bandEstimate) return null
 
   return (
     <div>
-      <h2 className="text-base font-semibold text-slate-900 mb-3">Feedback</h2>
+      <BandEstimatePanel bandEstimate={bandEstimate} />
+      {feedback.length > 0 && <h2 className="text-base font-semibold text-slate-900 mb-3">Feedback</h2>}
       {feedback.map((unit, i) => (
         <div key={i} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm mb-3 last:mb-0">
           <p className="italic text-slate-600 border-l-2 border-slate-300 pl-3 mb-3 text-sm">

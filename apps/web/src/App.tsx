@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { PracticeMode, FeedbackLevel, FeedbackUnit, PracticeRecord } from './types'
+import type { PracticeMode, FeedbackLevel, FeedbackUnit, PracticeRecord, BandEstimate } from './types'
 import { requestFeedback } from './lib/api'
 import { PROMPT_BANK } from './lib/promptBank'
 import { loadHistory, renameRecord, deleteRecord } from './lib/storage'
@@ -17,6 +17,7 @@ export default function App() {
   const [topicName, setTopicName] = useState(PROMPT_BANK['thesis'][0].topicName)
   const [draft, setDraft] = useState('')
   const [feedback, setFeedback] = useState<FeedbackUnit[]>([])
+  const [bandEstimate, setBandEstimate] = useState<BandEstimate | undefined>()
   const [loading, setLoading] = useState(false)
   const [feedbackError, setFeedbackError] = useState<string | null>(null)
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory())
@@ -33,16 +34,22 @@ export default function App() {
     setTopicName(PROMPT_BANK[newMode][0].topicName)
     setDraft('')
     setFeedback([])
+    setBandEstimate(undefined)
     setFeedbackError(null)
     setSessionId(crypto.randomUUID())
   }
 
   async function handleCheck(level: FeedbackLevel) {
+    if (!prompt.trim()) {
+      setFeedbackError('Topic prompt is required.')
+      return
+    }
     setLoading(true)
     setFeedbackError(null)
     try {
       const result = await requestFeedback({ mode, level, text: draft, prompt })
       setFeedback(result.feedback ?? [])
+      setBandEstimate(result.bandEstimate)
     } catch {
       setFeedbackError('Feedback service unavailable. Please try again.')
     } finally {
@@ -60,6 +67,7 @@ export default function App() {
     setTopicName(record.topicName)
     setDraft(record.draft)
     setFeedback(record.feedback)
+    setBandEstimate(record.bandEstimate)
     setFeedbackError(null)
   }
 
@@ -119,6 +127,7 @@ export default function App() {
               prompt={prompt}
               topicName={topicName}
               feedback={feedback}
+              bandEstimate={bandEstimate}
               sessionId={sessionId}
               onSaved={handleSaved}
             />
@@ -126,7 +135,7 @@ export default function App() {
 
           <div>
             <div className="sticky top-6">
-              <FeedbackPanel feedback={feedback} draft={draft} />
+              <FeedbackPanel feedback={feedback} draft={draft} bandEstimate={bandEstimate} />
               <HistoryList
                 history={history}
                 onSelect={handleSelectRecord}

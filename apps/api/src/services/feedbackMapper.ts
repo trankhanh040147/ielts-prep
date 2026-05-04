@@ -1,4 +1,6 @@
-import type { FeedbackLevel, FeedbackUnit } from '../types'
+import type { BandEstimate, FeedbackLevel, FeedbackUnit } from '../types'
+
+const DEFAULT_BAND_SUMMARY = 'Estimated IELTS band based on this draft.'
 
 export function mapGeminiToFeedback(raw: unknown, level: FeedbackLevel, fallbackText: string): FeedbackUnit[] {
   const items = (raw as { feedback?: unknown[] })?.feedback
@@ -46,4 +48,44 @@ export function mapGeminiToFeedback(raw: unknown, level: FeedbackLevel, fallback
       revision: { explanation, rewrites },
     }
   })
+}
+
+function parseBandScore(value: unknown): number | undefined {
+  const numeric = typeof value === 'number' ? value : typeof value === 'string' && value.trim() !== '' ? Number(value) : NaN
+  if (!Number.isFinite(numeric)) return undefined
+  const rounded = Math.round(numeric * 2) / 2
+  return Math.min(9, Math.max(0, rounded))
+}
+
+export function mapGeminiToBandEstimate(raw: unknown): BandEstimate | undefined {
+  const estimate = (raw as { bandEstimate?: unknown })?.bandEstimate
+  if (!estimate || typeof estimate !== 'object') return undefined
+
+  const source = estimate as Record<string, unknown>
+  const overall = parseBandScore(source.overall)
+  const taskAchievement = parseBandScore(source.taskAchievement)
+  const coherenceCohesion = parseBandScore(source.coherenceCohesion)
+  const lexicalResource = parseBandScore(source.lexicalResource)
+  const grammaticalRangeAccuracy = parseBandScore(source.grammaticalRangeAccuracy)
+
+  if (
+    overall === undefined ||
+    taskAchievement === undefined ||
+    coherenceCohesion === undefined ||
+    lexicalResource === undefined ||
+    grammaticalRangeAccuracy === undefined
+  ) {
+    return undefined
+  }
+
+  const summary = typeof source.summary === 'string' && source.summary.trim() ? source.summary.trim() : DEFAULT_BAND_SUMMARY
+
+  return {
+    overall,
+    taskAchievement,
+    coherenceCohesion,
+    lexicalResource,
+    grammaticalRangeAccuracy,
+    summary,
+  }
 }

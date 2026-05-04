@@ -76,4 +76,42 @@ describe('HistoryList', () => {
     await user.click(screen.getByRole('button', { name: /delete/i }))
     expect(onDelete).toHaveBeenCalledWith('r1')
   })
+
+  it('shows word count, overall band, and attempt labels', () => {
+    const older: PracticeRecord = {
+      ...record,
+      id: 'older',
+      draft: 'one two three',
+      updatedAt: '2026-04-22T09:00:00.000Z',
+      bandEstimate: {
+        overall: 6,
+        taskAchievement: 6,
+        coherenceCohesion: 6,
+        lexicalResource: 6,
+        grammaticalRangeAccuracy: 6,
+        summary: 'ok',
+      },
+    }
+    const newer: PracticeRecord = {
+      ...record,
+      id: 'newer',
+      draft: 'one two three four',
+      updatedAt: '2026-04-22T10:00:00.000Z',
+      bandEstimate: {
+        overall: 6.5,
+        taskAchievement: 6,
+        coherenceCohesion: 6.5,
+        lexicalResource: 7,
+        grammaticalRangeAccuracy: 6,
+        summary: 'better',
+      },
+    }
+
+    render(<HistoryList history={[newer, older]} onSelect={vi.fn()} onRename={vi.fn()} onDelete={vi.fn()} />)
+
+    expect(screen.getByText('Attempt 2')).toBeInTheDocument()
+    expect(screen.getByText('Attempt 1')).toBeInTheDocument()
+    expect(screen.getByText('4 words')).toBeInTheDocument()
+    expect(screen.getByText('Band 6.5')).toBeInTheDocument()
+  })
 })

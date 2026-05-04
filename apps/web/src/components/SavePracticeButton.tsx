@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { PracticeMode, FeedbackUnit, PracticeRecord } from '../types'
+import type { PracticeMode, FeedbackUnit, PracticeRecord, BandEstimate } from '../types'
 import { savePractice } from '../lib/storage'
 
 interface SavePracticeButtonProps {
@@ -8,11 +8,12 @@ interface SavePracticeButtonProps {
   prompt: string
   topicName: string
   feedback: FeedbackUnit[]
+  bandEstimate?: BandEstimate
   sessionId: string
   onSaved: (history: PracticeRecord[]) => void
 }
 
-export function SavePracticeButton({ draft, mode, prompt, topicName, feedback, sessionId, onSaved }: SavePracticeButtonProps) {
+export function SavePracticeButton({ draft, mode, prompt, topicName, feedback, bandEstimate, sessionId, onSaved }: SavePracticeButtonProps) {
   const [error, setError] = useState<string | null>(null)
 
   function handleSave() {
@@ -25,6 +26,7 @@ export function SavePracticeButton({ draft, mode, prompt, topicName, feedback, s
         topicName,
         draft,
         feedback,
+        bandEstimate,
         updatedAt: new Date().toISOString(),
       })
       onSaved(history)

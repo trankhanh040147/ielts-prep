@@ -10,6 +10,14 @@ export type FeedbackUnit = {
     rewrites: string[]
   }
 }
+export type BandEstimate = {
+  overall: number
+  taskAchievement: number
+  coherenceCohesion: number
+  lexicalResource: number
+  grammaticalRangeAccuracy: number
+  summary: string
+}
 export type PracticeRecord = {
   id: string
   mode: PracticeMode
@@ -17,6 +25,8 @@ export type PracticeRecord = {
   topicName: string
   draft: string
   feedback: FeedbackUnit[]
+  bandEstimate?: BandEstimate
   updatedAt: string
 }
 export type TopicResponse = { prompt: string; topicName: string }
+export type FeedbackResponse = { feedback: FeedbackUnit[]; bandEstimate?: BandEstimate }

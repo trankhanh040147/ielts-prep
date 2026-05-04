@@ -92,3 +92,58 @@ describe('mapGeminiToFeedback', () => {
     expect(out[0].revision.rewrites).toEqual([])
   })
 })
+
+describe('mapGeminiToBandEstimate', () => {
+  it('maps and rounds a valid band estimate', async () => {
+    const { mapGeminiToBandEstimate } = await import('../services/feedbackMapper')
+    const out = mapGeminiToBandEstimate({
+      bandEstimate: {
+        overall: 6.74,
+        taskAchievement: '6.2',
+        coherenceCohesion: 7,
+        lexicalResource: 6.5,
+        grammaticalRangeAccuracy: 6,
+        summary: 'Clear answer with some grammar weaknesses.',
+      },
+    })
+
+    expect(out).toEqual({
+      overall: 6.5,
+      taskAchievement: 6,
+      coherenceCohesion: 7,
+      lexicalResource: 6.5,
+      grammaticalRangeAccuracy: 6,
+      summary: 'Clear answer with some grammar weaknesses.',
+    })
+  })
+
+  it('clamps out-of-range scores and supplies default summary', async () => {
+    const { mapGeminiToBandEstimate } = await import('../services/feedbackMapper')
+    const out = mapGeminiToBandEstimate({
+      bandEstimate: {
+        overall: 12,
+        taskAchievement: -1,
+        coherenceCohesion: 8.25,
+        lexicalResource: 5.75,
+        grammaticalRangeAccuracy: 6.25,
+        summary: '   ',
+      },
+    })
+
+    expect(out).toEqual({
+      overall: 9,
+      taskAchievement: 0,
+      coherenceCohesion: 8.5,
+      lexicalResource: 6,
+      grammaticalRangeAccuracy: 6.5,
+      summary: 'Estimated IELTS band based on this draft.',
+    })
+  })
+
+  it('returns undefined when band estimate is missing or incomplete', async () => {
+    const { mapGeminiToBandEstimate } = await import('../services/feedbackMapper')
+    expect(mapGeminiToBandEstimate({})).toBeUndefined()
+    expect(mapGeminiToBandEstimate({ bandEstimate: { overall: 6 } })).toBeUndefined()
+    expect(mapGeminiToBandEstimate({ bandEstimate: { overall: 'six' } })).toBeUndefined()
+  })
+})

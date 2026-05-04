@@ -11,3 +11,12 @@ export type FeedbackUnit = {
     rewrites: string[]
   }
 }
+
+export type BandEstimate = {
+  overall: number
+  taskAchievement: number
+  coherenceCohesion: number
+  lexicalResource: number
+  grammaticalRangeAccuracy: number
+  summary: string
+}

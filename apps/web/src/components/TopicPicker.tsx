@@ -10,21 +10,49 @@ interface TopicPickerProps {
   onTopicChange: (prompt: string, topicName: string) => void
 }
 
+function deriveTopicName(prompt: string): string {
+  const words = prompt.trim().split(/\s+/).filter(Boolean).slice(0, 5)
+  return words.length === 0 ? 'Custom Topic' : words.join(' ')
+}
+
 export function TopicPicker({ mode, prompt, topicName, onTopicChange }: TopicPickerProps) {
   const [generating, setGenerating] = useState(false)
   const [generateError, setGenerateError] = useState<string | null>(null)
+  const [customOpen, setCustomOpen] = useState(false)
+  const [customPrompt, setCustomPrompt] = useState('')
+  const [sessionNameEdited, setSessionNameEdited] = useState(false)
 
   async function handleGenerate() {
     setGenerating(true)
     setGenerateError(null)
     try {
       const result = await generateTopic(mode)
+      setCustomOpen(false)
+      setCustomPrompt('')
+      setSessionNameEdited(false)
       onTopicChange(result.prompt, result.topicName)
     } catch {
       setGenerateError("Couldn't generate topic. Try again.")
     } finally {
       setGenerating(false)
     }
+  }
+
+  function handleStaticTopicChange(newPrompt: string, newTopicName: string) {
+    setCustomOpen(false)
+    setCustomPrompt('')
+    setSessionNameEdited(false)
+    onTopicChange(newPrompt, newTopicName)
+  }
+
+  function handleCustomPromptChange(value: string) {
+    setCustomPrompt(value)
+    onTopicChange(value, sessionNameEdited ? topicName : deriveTopicName(value))
+  }
+
+  function handleSessionNameChange(value: string) {
+    setSessionNameEdited(true)
+    onTopicChange(prompt, value)
   }
 
   return (
@@ -35,7 +63,7 @@ export function TopicPicker({ mode, prompt, topicName, onTopicChange }: TopicPic
           <button
             key={entry.topicName}
             type="button"
-            onClick={() => onTopicChange(entry.prompt, entry.topicName)}
+            onClick={() => handleStaticTopicChange(entry.prompt, entry.topicName)}
             aria-pressed={topicName === entry.topicName}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               topicName === entry.topicName
@@ -54,9 +82,28 @@ export function TopicPicker({ mode, prompt, topicName, onTopicChange }: TopicPic
         >
           {generating ? 'Generating…' : '✨ Generate new…'}
         </button>
+        <button
+          type="button"
+          onClick={() => setCustomOpen((open) => !open)}
+          className="rounded-full px-3 py-1 text-xs font-medium border border-slate-300 text-slate-500 hover:border-indigo-400 hover:text-indigo-600 transition-colors"
+        >
+          Use custom topic
+        </button>
       </div>
       {generateError && (
         <p role="alert" className="text-xs text-red-600 mb-2">{generateError}</p>
+      )}
+      {customOpen && (
+        <div className="mb-3">
+          <label htmlFor="custom-topic" className="block text-xs text-slate-500 mb-1">Custom IELTS Task 2 topic</label>
+          <textarea
+            id="custom-topic"
+            value={customPrompt}
+            onChange={(e) => handleCustomPromptChange(e.target.value)}
+            rows={3}
+            className="w-full text-sm border border-slate-200 rounded-md px-2 py-1 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
       )}
       <div className="flex items-center gap-2">
         <label htmlFor="topic-name" className="text-xs text-slate-400 whitespace-nowrap">Session name</label>
@@ -64,7 +111,7 @@ export function TopicPicker({ mode, prompt, topicName, onTopicChange }: TopicPic
           id="topic-name"
           type="text"
           value={topicName}
-          onChange={(e) => onTopicChange(prompt, e.target.value)}
+          onChange={(e) => handleSessionNameChange(e.target.value)}
           className="flex-1 text-sm border border-slate-200 rounded-md px-2 py-1 text-slate-800 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         />
       </div>

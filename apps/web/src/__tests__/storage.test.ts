@@ -39,6 +39,28 @@ describe('storage', () => {
     expect(history).toHaveLength(1)
     expect(history[0].draft).toBe('v2')
   })
+
+  it('preserves optional bandEstimate on saved records', () => {
+    savePractice({
+      id: 'score-1',
+      mode: 'thesis',
+      prompt: 'p',
+      topicName: 'Topic',
+      draft: 'draft text',
+      feedback: [],
+      bandEstimate: {
+        overall: 6.5,
+        taskAchievement: 6,
+        coherenceCohesion: 6.5,
+        lexicalResource: 7,
+        grammaticalRangeAccuracy: 6,
+        summary: 'Good but uneven.',
+      },
+      updatedAt: '2026-05-04T10:00:00.000Z',
+    })
+
+    expect(loadHistory()[0].bandEstimate?.overall).toBe(6.5)
+  })
 })
 
 describe('loadHistory — topicName migration', () => {

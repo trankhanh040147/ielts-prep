@@ -24,21 +24,27 @@
 
 ---
 
-## v0.3 — In Progress
+## v0.3 — Done ✅
 
 ### Topic Management
-- [ ] **Next:** Topic picker — AI-generated prompts or user-pasted topic; history stores topic name (user-editable)
+- [x] Topic picker — static topic chips per practice mode
+- [x] AI-generated Task 2 topics via `POST /api/topic`
+- [x] Topic generation fallback when Gemini is unavailable
+- [x] Session/topic name stored in local history
+- [x] User-editable history topic names
+- [x] Delete saved history records
+- [x] User-pasted/custom topic prompt
 
 ### Practice Quality
-- [ ] Word count indicator in editor
+- [x] Word count indicator in editor
 
 ### Feedback & Scoring
-- [ ] Band score estimate per submission (Task Achievement, CC, LR, GRA)
-- [ ] Feedback history per prompt — track improvement over multiple attempts
+- [x] Band score estimate per submission (Task Achievement, CC, LR, GRA)
+- [x] Feedback history per prompt — track improvement over multiple attempts
 
-### Infrastructure
-- [ ] Task 1 support (graph/chart/map/process descriptions)
-- [ ] Cloud sync + auth (when local-only becomes a limitation)
+### Deferred
+- Task 1 support (graph/chart/map/process descriptions)
+- Cloud sync + auth (when local-only becomes a limitation)
 
 --- 
 

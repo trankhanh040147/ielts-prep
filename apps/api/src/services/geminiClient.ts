@@ -24,9 +24,11 @@ export async function getGeminiFeedback(input: GeminiInput): Promise<unknown> {
 
   const instruction = [
     'You are an IELTS writing coach. Return strict JSON only — no markdown, no text outside JSON.',
-    'Schema: {"feedback":[{"targetText":string,"strengths":[string],"issues":[string],"revision":{"explanation":string,"rewrites":[string]}}]}.',
+    'Schema: {"feedback":[{"targetText":string,"strengths":[string],"issues":[string],"revision":{"explanation":string,"rewrites":[string]}}],"bandEstimate":{"overall":number,"taskAchievement":number,"coherenceCohesion":number,"lexicalResource":number,"grammaticalRangeAccuracy":number,"summary":string}}.',
     '"explanation" must state WHY the writing is weak and WHAT grammatical or rhetorical principle fixes it.',
     '"rewrites" must contain 2–3 concrete alternative sentences that fix the identified issue.',
+    'Also estimate IELTS Writing Task 2 band scores from 0 to 9 using half-band increments for Task Achievement, Coherence and Cohesion, Lexical Resource, and Grammatical Range and Accuracy.',
+    'The bandEstimate.summary must briefly explain the score in one sentence.',
     sentenceRule,
     `Practice mode: ${input.mode}.`,
     `Topic: ${input.prompt}`,

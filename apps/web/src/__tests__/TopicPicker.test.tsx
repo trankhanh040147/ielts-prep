@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { useState } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TopicPicker } from '../components/TopicPicker'
@@ -11,7 +12,9 @@ const baseProps = {
   onTopicChange: vi.fn(),
 }
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 describe('TopicPicker', () => {
   it('renders 4 chip buttons for thesis mode', () => {
@@ -72,5 +75,53 @@ describe('TopicPicker', () => {
     await user.clear(input)
     await user.type(input, 'X')
     expect(onTopicChange).toHaveBeenLastCalledWith(baseProps.prompt, expect.stringContaining('X'))
+  })
+
+  it('shows custom topic textarea when Use custom topic is clicked', async () => {
+    const user = userEvent.setup()
+    render(<TopicPicker {...baseProps} />)
+    await user.click(screen.getByRole('button', { name: /use custom topic/i }))
+    expect(screen.getByLabelText(/custom ielts task 2 topic/i)).toBeInTheDocument()
+  })
+
+  it('typing custom topic updates prompt and derives topic name', async () => {
+    const user = userEvent.setup()
+    const onTopicChange = vi.fn()
+    render(<TopicPicker {...baseProps} onTopicChange={onTopicChange} />)
+    await user.click(screen.getByRole('button', { name: /use custom topic/i }))
+    await user.type(screen.getByLabelText(/custom ielts task 2 topic/i), 'Some people believe public transport should be free.')
+    expect(onTopicChange).toHaveBeenLastCalledWith(
+      'Some people believe public transport should be free.',
+      'Some people believe public transport',
+    )
+  })
+
+  it('does not overwrite manually edited session name while custom topic changes', async () => {
+    const user = userEvent.setup()
+    const onTopicChange = vi.fn()
+
+    function Harness() {
+      const [prompt, setPrompt] = useState(baseProps.prompt)
+      const [topicName, setTopicName] = useState(baseProps.topicName)
+      return (
+        <TopicPicker
+          {...baseProps}
+          prompt={prompt}
+          topicName={topicName}
+          onTopicChange={(nextPrompt, nextTopicName) => {
+            onTopicChange(nextPrompt, nextTopicName)
+            setPrompt(nextPrompt)
+            setTopicName(nextTopicName)
+          }}
+        />
+      )
+    }
+
+    render(<Harness />)
+    await user.click(screen.getByRole('button', { name: /use custom topic/i }))
+    await user.clear(screen.getByLabelText('Session name'))
+    await user.type(screen.getByLabelText('Session name'), 'My Custom Label')
+    await user.type(screen.getByLabelText(/custom ielts task 2 topic/i), ' New prompt text')
+    expect(onTopicChange).toHaveBeenLastCalledWith(expect.stringContaining('New prompt text'), 'My Custom Label')
   })
 })

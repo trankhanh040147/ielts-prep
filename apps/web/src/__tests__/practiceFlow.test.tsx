@@ -21,6 +21,14 @@ function makeFeedbackResponse(overrides: object = {}) {
           ...overrides,
         },
       ],
+      bandEstimate: {
+        overall: 6.5,
+        taskAchievement: 6,
+        coherenceCohesion: 6.5,
+        lexicalResource: 7,
+        grammaticalRangeAccuracy: 6,
+        summary: 'Clear answer with room for grammar improvement.',
+      },
     }),
     { status: 200 },
   )
@@ -53,12 +61,33 @@ it('saves practice and reloads from history', async () => {
   await user.type(screen.getByLabelText(/writing draft/i), 'My draft text here.')
   await user.click(screen.getByRole('button', { name: /check sentence/i }))
   await screen.findByText(/clear thesis/i)
+  expect(await screen.findByText('Overall')).toBeInTheDocument()
+  expect(screen.getAllByText('6.5').length).toBeGreaterThan(0)
 
   await user.click(screen.getByRole('button', { name: /save practice/i }))
 
   const entries = await screen.findAllByText('Railways vs Roads')
   // At least 2: one TopicPicker chip + one HistoryList entry
   expect(entries.length).toBeGreaterThanOrEqual(2)
+  expect(screen.getAllByText('4 words').length).toBeGreaterThan(0)
+  expect(screen.getByText('Band 6.5')).toBeInTheDocument()
+})
+
+it('uses custom topic prompt for feedback requests', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => makeFeedbackResponse()) as unknown as typeof fetch)
+
+  const user = userEvent.setup()
+  render(<App />)
+
+  await user.click(screen.getByRole('button', { name: /use custom topic/i }))
+  await user.type(screen.getByLabelText(/custom ielts task 2 topic/i), 'Some people think public transport should be free. To what extent do you agree?')
+  await user.type(screen.getByLabelText(/writing draft/i), 'Public transport should be free because it improves access.')
+  await user.click(screen.getByRole('button', { name: /check sentence/i }))
+
+  await screen.findByText(/clear thesis/i)
+  const fetchMock = vi.mocked(fetch)
+  const callBody = JSON.parse(fetchMock.mock.calls[0][1]?.body as string)
+  expect(callBody.prompt).toBe('Some people think public transport should be free. To what extent do you agree?')
 })
 
 it('shows error when saving empty draft', async () => {

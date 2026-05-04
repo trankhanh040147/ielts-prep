@@ -17,6 +17,15 @@ const unit: FeedbackUnit = {
   },
 }
 
+const bandEstimate = {
+  overall: 6.5,
+  taskAchievement: 6,
+  coherenceCohesion: 6.5,
+  lexicalResource: 7,
+  grammaticalRangeAccuracy: 6,
+  summary: 'Clear answer with room for grammar improvement.',
+}
+
 describe('FeedbackPanel', () => {
   it('renders nothing when feedback is empty', () => {
     const { container } = render(<FeedbackPanel feedback={[]} draft="" />)
@@ -65,5 +74,18 @@ describe('FeedbackPanel', () => {
     render(<FeedbackPanel feedback={[unit]} draft={draft} />)
     const delEl = document.querySelector('del')
     expect(delEl?.textContent).toContain('taking')
+  })
+
+  it('renders band estimate when provided', () => {
+    render(<FeedbackPanel feedback={[unit]} draft="" bandEstimate={bandEstimate} />)
+    expect(screen.getByText('Overall')).toBeInTheDocument()
+    expect(screen.getAllByText('6.5').length).toBeGreaterThan(0)
+    expect(screen.getByText('Task Achievement')).toBeInTheDocument()
+    expect(screen.getByText('Clear answer with room for grammar improvement.')).toBeInTheDocument()
+  })
+
+  it('omits band estimate UI when not provided', () => {
+    render(<FeedbackPanel feedback={[unit]} draft="" />)
+    expect(screen.queryByText('Overall')).not.toBeInTheDocument()
   })
 })
